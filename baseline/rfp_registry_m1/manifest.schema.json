@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/rfp-registry/manifest-v1.1.schema.json",
+  "title": "RFP Registry extraction manifest v1.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "package_id",
+    "project_id",
+    "generated_utc",
+    "source",
+    "limits",
+    "summary",
+    "entries"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.1"
+    },
+    "package_id": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "string"
+    },
+    "limits": {
+      "type": "object"
+    },
+    "summary": {
+      "type": "object"
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "entry_id",
+          "parent_id",
+          "source_path",
+          "original_name",
+          "kind",
+          "status",
+          "size_bytes",
+          "sha256",
+          "extracted_relative_path",
+          "error_code",
+          "detail",
+          "depth",
+          "snapshot_relative_path"
+        ],
+        "properties": {
+          "entry_id": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_path": {
+            "type": "string"
+          },
+          "original_name": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "file",
+              "archive",
+              "directory",
+              "archive_issue"
+            ]
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "stored",
+              "failed",
+              "listed"
+            ]
+          },
+          "size_bytes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "extracted_relative_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "error_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "detail": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "depth": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "snapshot_relative_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

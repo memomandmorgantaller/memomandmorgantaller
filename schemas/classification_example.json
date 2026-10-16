@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "package_id": "PKG-EXAMPLE",
+  "entry_id": "E0000184",
+  "content_sha256": "EXAMPLE_REPLACE_WITH_REAL_HASH",
+  "rulebook_version": "1.0",
+  "agent_profile_version": "A5-0.1",
+  "classification": {
+    "document_type": "engineering_drawing",
+    "purpose": "project_issued_design",
+    "issuance_context": "original_rfp",
+    "primary_discipline": "mechanical"
+  },
+  "recommendation": {
+    "destination_code": "04",
+    "status": "proposed",
+    "requires_human_review": true
+  },
+  "evidence_refs": [
+    {
+      "artifact_id": "TEXT-E0000184",
+      "location": {
+        "page": 1,
+        "start_offset": 0,
+        "end_offset": 29
+      },
+      "field": "drawing_title"
+    }
+  ],
+  "alternatives": [
+    "05"
+  ],
+  "reason_codes": [
+    "PROJECT_ISSUED_DRAWING"
+  ]
+}

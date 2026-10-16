@@ -1,0 +1,28 @@
+version: "1.0"
+project_selection: explicit
+flat_destinations_only: true
+unknown_destination_action: human_review
+filename_collision_different_content: human_review
+preserve_original_archives: true
+archive_leaf_handling: extract_and_classify
+verified_addendum_override: "06"
+verified_clarification_override: "07"
+vendor_drawings: classify_by_purpose_and_context
+all_uploads_require_human_approval_initially: true
+destinations:
+  - {code: "00", folder: "00 - START HERE"}
+  - {code: "01", folder: "01 - Commercial & Contract"}
+  - {code: "02", folder: "02 - Scope of Work"}
+  - {code: "03", folder: "03 - Specifications"}
+  - {code: "04", folder: "04 - Drawings"}
+  - {code: "05", folder: "05 - Vendor Data"}
+  - {code: "06", folder: "06 - Addenda"}
+  - {code: "07", folder: "07 - Clarifications (Q&A)"}
+  - {code: "08", folder: "08 - Site Access & Safety"}
+precedence:
+  - verified_addendum_membership
+  - verified_clarification_membership
+  - explicit_approved_company_rule
+  - issuance_context_and_content
+  - verified_historical_precedent
+  - filename_and_source_path_heuristics

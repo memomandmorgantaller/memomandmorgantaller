@@ -1,0 +1,6 @@
+Handoff assembled 2026-10-16.
+Baseline source extracted from /mnt/data/RFP_Document_Registry_Milestone_1.zip.
+Verification command: cd baseline/rfp_registry_m1 && python -m pytest -q
+Actual result in this runtime: 10 passed in 0.14s (Linux container).
+Windows-specific execution: not performed.
+Actual real/sanitized complex RFP content: not supplied in this conversation.
