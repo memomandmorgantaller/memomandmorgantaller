@@ -36,8 +36,9 @@
 
 ## Pending evidence and improvements
 
-- Windows CI and real workstation execution, especially junctions, ACLs, process memory
-  containment, cancellation and file-locking behavior. A Linux pass is not Windows evidence.
+- Real restricted Windows workstation execution, especially ACLs, process memory
+  containment, cancellation and file-locking behavior. Hosted Windows CI has passed;
+  it does not replace workstation/deployment validation.
 - Disk/network-share failure injection, concurrent hostile filesystem mutation, crash at
   every persistence boundary, backup/restore and large-package performance characterization.
 - Sanitized representative RFP, verified correctly filed examples, workstation constraints,
@@ -70,6 +71,10 @@ explicitly. Three reporter regressions verify failure/error visibility, workflow
 escaping and clean passing output. No tests were disabled to obtain a pass.
 
 Local validation after these fixes: **61 passed, 1 Windows-only test skipped**; Ruff,
-formatting and mypy (including the reporter) passed. GitHub-hosted Windows validation
-must come from the subsequent run, not this Linux result. See Actions for the exact
-commit's outcome. No parser/schema migration or filing-policy change is involved.
+formatting and mypy (including the reporter) passed.
+
+**Confirmed hosted-runner outcome:** Windows tests, Linux tests and static checks all
+passed for `3ad2d1e` in [run 38917255658](https://github.com/memomandmorgantaller/memomandmorgantaller/actions/runs/38917255658). The successful run has no
+warning/error annotations. The Windows test count is not inferred from the Linux
+count; detailed test logs require sign-in. No parser/schema migration or filing-policy
+change is involved. Workstation containment and production gates remain open.

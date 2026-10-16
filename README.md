@@ -2,8 +2,12 @@
 
 Working Sprint 0 / first Sprint 1 slice: local intake, nested ZIP decomposition,
 retained source snapshots, PDF/DOCX/XLSX/TXT evidence extraction and a durable SQLite
-registry. Python 3.12; Windows-first scripts with Linux validation. No AI, classification,
+registry. Python 3.12; Windows and Linux CI validated. No AI, classification,
 approval, export or SharePoint connector is enabled in this slice.
+
+Windows tests, Linux tests and static checks passed for `3ad2d1e` in
+[GitHub Actions](https://github.com/memomandmorgantaller/memomandmorgantaller/actions/runs/38917255658). Production workstation deployment and parser containment
+remain separate validation gates.
 
 Start with [operator instructions](baseline/rfp_registry_m1/README.md).
 Read [delivery evidence and remaining gates](docs/09_SPRINT_0_1_DELIVERY.md) for exact

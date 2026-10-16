@@ -27,12 +27,18 @@ The baseline package evolved in place to **v0.2.0**; its original flags remain a
 
 ## Actual validation
 
-**54 passed, 1 skipped** (Windows junction test) on Linux. One intentional duplicate-ZIP
-fixture warning. Tests cover traversal/Windows names/NUL preservation, unsafe directories,
+**Initial delivery:** 54 passed, 1 skipped (Windows junction test) on Linux, with
+one intentional duplicate-ZIP fixture warning. Tests cover traversal/Windows names/NUL preservation, unsafe directories,
 duplicate occurrences, CRC/deflate corruption, encryption/compression features, metadata,
 size/count/ratio/depth/deadline/disk limits, source changes/snapshots, real supported file
 formats, XML entities, parser timeout/protocol, tamper audits, schema-version rejection,
 interrupted extraction recovery, deferred recovery and CLI exit codes.
+
+**CI follow-up:** after fixing the deadline boundary and preserving raw ZIP fixture
+names on Windows, local validation passed 61 tests with 1 Windows-only skip and no
+warnings. Windows tests, Linux tests and static checks all passed for `3ad2d1e` in
+[run 38917255658](https://github.com/memomandmorgantaller/memomandmorgantaller/actions/runs/38917255658). The expected duplicate-name warning is now asserted.
+This is hosted-runner evidence; production workstation validation remains outstanding.
 
 Commands from `baseline/rfp_registry_m1` (verification venv `/workspace/registry-verify`,
 independent tooling venv `/workspace/registry-tools`):
@@ -41,9 +47,9 @@ independent tooling venv `/workspace/registry-tools`):
 python -m pip install --require-hashes -r requirements.lock
 python -m pip install --no-deps --no-build-isolation -e .
 python -m pytest -q
-ruff check rfp_registry tests examples
-ruff format --check rfp_registry tests examples
-mypy --python-executable /workspace/registry-verify/bin/python rfp_registry
+ruff check rfp_registry tests examples ci
+ruff format --check rfp_registry tests examples ci
+mypy --python-executable /workspace/registry-verify/bin/python rfp_registry ci
 pip-audit --no-deps --disable-pip -r requirements.lock
 python examples/create_vertical_slice.py --output artifacts/demo/input.zip
 python -m rfp_registry --source artifacts/demo/input.zip --project SYNTHETIC-DEMO --output artifacts/demo/result
@@ -73,7 +79,7 @@ Every parsed result requires human review. No customer package was supplied or t
 ## Remaining gates
 
 This is a working first slice, **not full Sprint 0 security signoff or all of Sprint 1**.
-Actual Windows/CI execution, Windows parser memory containment, full intake crash/resume,
+Restricted Windows workstation validation, Windows parser memory containment, full intake crash/resume,
 hostile-filesystem TOCTOU/fuzzing, backup/restore, performance tuning and production
 ACL/encryption/retention deployment remain. Read-only attributes are not WORM storage;
 directory intake captures individual files, not a filesystem-atomic package snapshot.

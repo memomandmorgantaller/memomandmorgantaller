@@ -144,6 +144,10 @@ python3.12 -m venv .venv
 ```
 
 Static validation used Ruff 0.17.1 and mypy 2.4.0; install these in a separate tooling
-environment, then run `ruff check rfp_registry tests examples`, `ruff format --check
-rfp_registry tests examples`, and `mypy rfp_registry`. Windows CI is defined but has
-not been executed in this Linux task. See `docs/09_SPRINT_0_1_DELIVERY.md` at repo root.
+environment, then run `ruff check rfp_registry tests examples ci`, `ruff format --check
+rfp_registry tests examples ci`, and `mypy rfp_registry ci`. Windows and Linux test
+jobs plus static checks passed for `3ad2d1e` in
+[GitHub Actions](https://github.com/memomandmorgantaller/memomandmorgantaller/actions/runs/38917255658). Local Linux validation after the fixes: 61 passed,
+1 Windows-only test skipped. This does not validate restricted workstation deployment,
+Windows parser memory containment or real customer data. See
+`docs/09_SPRINT_0_1_DELIVERY.md` at repo root.
