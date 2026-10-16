@@ -154,7 +154,7 @@ class Processor:
         return row
 
     def check_runtime(self, reserve: int = 0) -> None:
-        if time.monotonic() - self.started > self.limits.max_seconds:
+        if time.monotonic() - self.started >= self.limits.max_seconds:
             raise LimitError("TIME_LIMIT", "Package deadline exceeded")
         if shutil.disk_usage(self.output).free < self.limits.min_free_bytes + reserve:
             raise LimitError("DISK_LIMIT", "Insufficient disk reserve")

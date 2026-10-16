@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from rfp_registry.engine import Limits, Processor, hash_file
+from rfp_registry.engine import LimitError, Limits, Processor, hash_file
 from rfp_registry.extraction import extract
 from rfp_registry.pipeline import register
 from rfp_registry.storage import Registry
@@ -17,7 +17,12 @@ from rfp_registry.storage import Registry
 def archive(path, items):
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
         for name, value in items:
-            z.writestr(name, value)
+            # ZipInfo(name) normalizes backslashes on Windows. Set the raw name
+            # after construction so adversarial fixtures retain the intended bytes.
+            info = zipfile.ZipInfo()
+            info.filename = info.orig_filename = name
+            info.compress_type = zipfile.ZIP_DEFLATED
+            z.writestr(info, value)
     return path
 
 
@@ -74,6 +79,8 @@ def rows(out):
 )
 def test_unsafe_directories(tmp_path, name):
     source = archive(tmp_path / "input.zip", [(name, b""), ("safe.txt", "safe")])
+    with zipfile.ZipFile(source) as packaged:
+        assert packaged.infolist()[0].orig_filename == name
     out = tmp_path / "out"
     Processor(source, out, "P").run()
     assert rows(out)[1]["error_code"] == "UNSAFE_PATH"
@@ -103,7 +110,8 @@ def test_metadata_budget_blocks_whole_archive_explicitly(tmp_path):
 
 
 def test_exact_duplicate_members_preserve_occurrences(tmp_path):
-    source = archive(tmp_path / "input.zip", [("x.txt", "same"), ("x.txt", "same")])
+    with pytest.warns(UserWarning, match="Duplicate name"):
+        source = archive(tmp_path / "input.zip", [("x.txt", "same"), ("x.txt", "same")])
     out = tmp_path / "out"
     Processor(source, out, "P").run()
     assert register(out) == {"documents": 2, "parsed": 2, "exceptions": 0}
@@ -466,3 +474,21 @@ def test_plain_text_starting_pk_is_not_misidentified_as_zip(tmp_path):
     assert Processor(source, out, "P").run()["failed_entries"] == 0
     assert rows(out)[0]["kind"] == "file"
     assert register(out)["parsed"] == 1
+
+
+@pytest.mark.parametrize(
+    "budget,elapsed,expired", [(0, 0, True), (5, 5, True), (5, 4.999, False), (5, 5.001, True)]
+)
+def test_intake_deadline_boundary_with_same_clock_tick(tmp_path, budget, elapsed, expired):
+    source = tmp_path / "note.txt"
+    source.write_text("bounded input")
+    output = tmp_path / "out"
+    output.mkdir()
+    with patch("rfp_registry.engine.time.monotonic", side_effect=[100, 100 + elapsed]):
+        job = Processor(source, output, "P", Limits(max_seconds=budget))
+        if expired:
+            with pytest.raises(LimitError) as caught:
+                job.check_runtime()
+            assert caught.value.code == "TIME_LIMIT"
+        else:
+            job.check_runtime()

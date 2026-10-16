@@ -46,3 +46,30 @@
 - Sprint 2 regression matrix must cover all nine exact folders, verified addendum
   precedence, clarification precedence, contextual vendor drawings, collisions and
   review-bound approved no-clobber exports. No automatic filing in this slice.
+
+
+## GitHub Actions follow-up (2026-10-16)
+
+The initial pushed workflow passed Linux tests and static analysis but failed Windows
+pytest. Public summary annotations lacked the traceback; a JUnit annotation reporter
+was added without ignoring pytest's failure exit code. This exposed two concrete cases:
+
+- `test_unsafe_directories[a\\b/]`: Windows ZIP fixture construction normalized the
+  backslash into `/`. Construct raw member names after ZipInfo initialization, and
+  assert the original ZIP metadata matches the hostile name before processing it.
+  Keep path validation against `orig_filename`; do not relax the application policy.
+- `test_low_disk_and_deadline`: `elapsed > limit` allowed a zero deadline when two
+  clock reads had the same tick. Change to `elapsed >= limit`. New controlled-clock
+  regressions failed before this correction at zero and exact nonzero boundaries;
+  they also cover just-before and just-after expiry.
+
+Node 20 deprecation warnings were addressed by pinning official checkout/setup-python
+v6 commit SHAs (Node 24). Ubuntu is pinned to 24.04 to prevent unvalidated automatic
+runner-image migration. The expected duplicate-name fixture warning is now asserted
+explicitly. Three reporter regressions verify failure/error visibility, workflow-command
+escaping and clean passing output. No tests were disabled to obtain a pass.
+
+Local validation after these fixes: **61 passed, 1 Windows-only test skipped**; Ruff,
+formatting and mypy (including the reporter) passed. GitHub-hosted Windows validation
+must come from the subsequent run, not this Linux result. See Actions for the exact
+commit's outcome. No parser/schema migration or filing-policy change is involved.

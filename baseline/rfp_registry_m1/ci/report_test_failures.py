@@ -17,7 +17,7 @@ def main(path: Path) -> None:
         for tag in ("failure", "error"):
             for failure in case.findall(tag):
                 name = case.get("name", "unknown test")
-                detail = (failure.text or failure.get("message", ""))[-12000:]
+                detail = (failure.text or failure.get("message") or "")[-12000:]
                 print(f"::error::{escape(name + chr(10) + detail)}")
 
 

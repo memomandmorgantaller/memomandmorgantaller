@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-24.04, windows-latest]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -24,7 +24,7 @@ jobs:
         if: failure()
         run: python ci/report_test_failures.py test-results.xml
   static:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: baseline/rfp_registry_m1
@@ -36,6 +36,6 @@ jobs:
       - run: python -m pip install --require-hashes -r requirements.lock
       - run: python -m pip install --no-deps --no-build-isolation -e .
       - run: python -m pip install ruff==0.17.1 mypy==2.4.0
-      - run: ruff check rfp_registry tests examples
-      - run: ruff format --check rfp_registry tests examples
-      - run: mypy rfp_registry
+      - run: ruff check rfp_registry tests examples ci
+      - run: ruff format --check rfp_registry tests examples ci
+      - run: mypy rfp_registry ci
