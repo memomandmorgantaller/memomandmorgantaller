@@ -3,7 +3,7 @@ Push-Location (Join-Path $PSScriptRoot '..')
 try {
     python -c 'import sys,struct; assert sys.platform == "win32" and struct.calcsize("P") == 8, "Build on 64-bit Windows"'
     if ($LASTEXITCODE -ne 0) { throw 'A 64-bit Windows Python 3.12 build environment is required.' }
-    python -m PyInstaller --noconfirm --clean --onefile --windowed --name RFPRegistry --icon packaging/registry.ico --version-file packaging/version_info.txt --add-data 'examples/synthetic_vertical_slice.zip;assets' --collect-all pypdf --copy-metadata pypdf --copy-metadata defusedxml --distpath dist --workpath build --specpath build rfp_registry/desktop_entry.py
+    python -m PyInstaller --noconfirm --clean --onefile --windowed --name RFPRegistry --icon packaging/registry.ico --version-file packaging/version_info.txt --add-data 'examples/synthetic_vertical_slice.zip;assets' --collect-all pypdf --copy-metadata pypdf --copy-metadata defusedxml --distpath dist --workpath build --specpath . rfp_registry/desktop_entry.py
     if ($LASTEXITCODE -ne 0) { throw 'Executable build failed. Check PyInstaller output.' }
     python packaging/export_notices.py
     if ($LASTEXITCODE -ne 0) { throw 'Dependency notices could not be exported.' }

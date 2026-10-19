@@ -96,3 +96,7 @@ Local tests cover real demo processing, duplicate runs, project/output validatio
 failed-archive visibility, frozen-worker dispatch/failure, and stdout-free workers.
 Native UI and actual EXE/installer tests require Windows CI; local Linux passing
 results alone must not be described as a Windows release. See docs/13 for build gates.
+
+Build review also identified that PyInstaller resolves relative data paths from the
+spec directory. The generated spec is now placed at the project root so bundled demo
+assets and version/icon paths resolve consistently; build outputs remain ignored.
