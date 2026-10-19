@@ -11,3 +11,6 @@ artifacts/
 *.sqlite3-wal
 *.sqlite3-shm
 test-results.xml
+build/
+dist/
+*.spec

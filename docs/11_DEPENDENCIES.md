@@ -37,3 +37,16 @@ No application artifacts depend on the rejected version. This point-in-time resu
 is not a guarantee: repeat before release. Review version/license/advisory changes,
 obtain authenticated approved artifacts and rerun regressions when refreshing hashes;
 never replace a hash merely to bypass a verification failure.
+
+
+## Desktop build additions (2026-10-19)
+
+Tkinter ships with the selected Python runtime; the Windows distribution bundles
+Python/Tcl/Tk and runtime libraries. No new online runtime service is introduced.
+The Windows-only hash lock is `packaging/requirements-windows.lock` under the Python
+project. PyInstaller 6.22.3 and its locked dependencies are build tooling; the
+bootloader distribution exception permits the intended application distribution.
+The package includes installed third-party notices and Python/Tcl/Tk license texts
+when supplied by the build runtime. Organizational license/signing approval remains
+a separate deployment gate. Inno Setup 6 is supplied by the build runner.
+The combined runtime/build lock audit found no known vulnerabilities on 2026-10-19.

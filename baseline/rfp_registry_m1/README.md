@@ -1,7 +1,15 @@
-# Local registry — Sprint 0 / Sprint 1 slice (v0.2.0)
+# Local registry — desktop and CLI (v0.3.0)
 
 Run local intake and extraction without network credentials or a model server.
 All documents remain pending human review. See the root README for the roadmap.
+
+## End users: no PowerShell needed
+
+Use the tested Windows installer or portable executable from this repository's desktop
+release. The installer creates a desktop shortcut. Click **Try the built-in demonstration**,
+then **Process package**, then **Open results folder**. Python and libraries are bundled.
+See [desktop instructions](../../docs/13_WINDOWS_DESKTOP.md) for scope and signing status.
+The remaining instructions below are for source development and troubleshooting.
 
 ## Install and test on Windows
 

@@ -6,6 +6,7 @@ import json
 import re
 import subprocess
 import sys
+import tempfile
 import zipfile
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -13,7 +14,7 @@ from typing import Literal
 
 from defusedxml import ElementTree as ET
 
-from .safety import zip_metadata
+from .safety import atomic_json, zip_metadata
 
 PARSER_VERSION = "1.0"
 MAX_INPUT = 32_000_000
@@ -208,6 +209,22 @@ def extract(path: Path, name: str, timeout: float = 20) -> Extraction:
     offered. Windows process memory must additionally be constrained by deployment.
     """
     try:
+        if getattr(sys, "frozen", False):
+            # Windowed frozen executables have no Python interpreter/stdout.
+            # Re-enter the same bundle through a narrow worker dispatch and file IPC.
+            with tempfile.TemporaryDirectory(prefix="rfp-parser-") as temporary:
+                result_path = Path(temporary) / "result.json"
+                result = subprocess.run(
+                    [sys.executable, "--parse-worker", str(path), name, str(result_path)],
+                    capture_output=True,
+                    timeout=timeout,
+                    check=False,
+                    creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+                )
+                if result.returncode:
+                    return Extraction(error="PARSER_PROCESS_FAILED")
+                payload = json.loads(result_path.read_text(encoding="utf-8"))
+            return decode_result(payload)
         result = subprocess.run(
             [sys.executable, "-m", "rfp_registry.extraction", str(path), name],
             capture_output=True,
@@ -217,17 +234,21 @@ def extract(path: Path, name: str, timeout: float = 20) -> Extraction:
         if result.returncode:
             return Extraction(error="PARSER_PROCESS_FAILED")
         payload = json.loads(result.stdout)
-        if not isinstance(payload, dict):
-            raise ValueError("Invalid worker result root")
-        evidence = [Evidence(**row) for row in payload.pop("evidence")]
-        return Extraction(**payload, evidence=evidence)
+        return decode_result(payload)
     except subprocess.TimeoutExpired:
         return Extraction(error="PARSER_TIMEOUT")
     except (ValueError, TypeError, KeyError, OSError):
         return Extraction(error="PARSER_PROTOCOL_ERROR")
 
 
-if __name__ == "__main__":
+def decode_result(payload: object) -> Extraction:
+    if not isinstance(payload, dict):
+        raise ValueError("Invalid worker result root")
+    evidence = [Evidence(**row) for row in payload.pop("evidence")]
+    return Extraction(**payload, evidence=evidence)
+
+
+def worker_main(arguments: list[str]) -> None:
     import logging
 
     logging.getLogger("pypdf").disabled = True
@@ -236,4 +257,14 @@ if __name__ == "__main__":
 
         resource.setrlimit(resource.RLIMIT_AS, (512 * 1024 * 1024, 512 * 1024 * 1024))
         resource.setrlimit(resource.RLIMIT_CPU, (15, 15))
-    print(json.dumps(asdict(parse_local(Path(sys.argv[1]), sys.argv[2])), ensure_ascii=True))
+    if len(arguments) not in (2, 3):
+        raise SystemExit(2)
+    payload = asdict(parse_local(Path(arguments[0]), arguments[1]))
+    if len(arguments) == 3:
+        atomic_json(Path(arguments[2]), payload)
+    else:
+        print(json.dumps(payload, ensure_ascii=True))
+
+
+if __name__ == "__main__":
+    worker_main(sys.argv[1:])

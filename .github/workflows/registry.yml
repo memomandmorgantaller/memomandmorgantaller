@@ -1,5 +1,10 @@
 name: Registry validation
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches: [main]
+    tags: ['desktop-v*']
+  pull_request:
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
@@ -36,6 +41,56 @@ jobs:
       - run: python -m pip install --require-hashes -r requirements.lock
       - run: python -m pip install --no-deps --no-build-isolation -e .
       - run: python -m pip install ruff==0.17.1 mypy==2.4.0
-      - run: ruff check rfp_registry tests examples ci
-      - run: ruff format --check rfp_registry tests examples ci
-      - run: mypy rfp_registry ci
+      - run: ruff check rfp_registry tests examples ci packaging/export_notices.py
+      - run: ruff format --check rfp_registry tests examples ci packaging/export_notices.py
+      - run: mypy rfp_registry ci packaging/export_notices.py
+
+  windows-package:
+    needs: [test, static]
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: baseline/rfp_registry_m1
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - run: python -m pip install --require-hashes -r packaging/requirements-windows.lock
+      - run: python -m pip install --no-deps --no-build-isolation -e .
+      - name: Build portable executable and per-user installer
+        run: ./packaging/build_windows.ps1
+      - name: Test portable executable, installer and uninstall
+        run: python ci/verify_windows_distribution.py
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: RFPRegistry-Windows-x64
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            baseline/rfp_registry_m1/dist/RFPRegistry.exe
+            baseline/rfp_registry_m1/dist/RFPRegistry-Setup-0.3.0-x64.exe
+            baseline/rfp_registry_m1/dist/START_HERE.txt
+            baseline/rfp_registry_m1/dist/THIRD_PARTY_NOTICES.txt
+            baseline/rfp_registry_m1/dist/SHA256SUMS.txt
+  release:
+    if: startsWith(github.ref, 'refs/tags/desktop-v')
+    needs: windows-package
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: RFPRegistry-Windows-x64
+          path: release-assets
+      - name: Publish tested Windows downloads
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: >-
+          gh release create "$RELEASE_TAG" release-assets/*
+          --verify-tag --title "RFP Registry Desktop $RELEASE_TAG"
+          --notes-file baseline/rfp_registry_m1/packaging/RELEASE_NOTES.md

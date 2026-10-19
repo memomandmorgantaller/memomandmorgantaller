@@ -1,0 +1,35 @@
+RFP DOCUMENT REGISTRY 0.3.0 — WINDOWS QUICK START
+
+No Python or PowerShell is required to use this application.
+
+1. Run RFPRegistry-Setup-0.3.0-x64.exe to install for your Windows account.
+   Keep "Create a desktop shortcut" selected. No administrator account is needed.
+   Alternatively, run RFPRegistry.exe directly as a portable application.
+2. Open RFP Document Registry from your desktop or Start menu.
+3. Click "Try the built-in demonstration", then "Process package".
+4. Wait for completion. Four documents should have text extracted; one synthetic
+   CAD file deliberately needs attention. This is expected for the demo.
+5. Click "Open results folder" to see the inventory and text reports.
+
+For your own approved sanitized package:
+- Choose a ZIP/document or folder.
+- Enter the project or RFP name explicitly.
+- Choose where results go (default: RFPRegistryResults in your user folder).
+- Click Process package. Every run creates a fresh folder and retains original bytes.
+- Review exceptions; unsupported files are never silently ignored.
+
+This version inventories and extracts locally. It does not yet automatically
+classify into nine folders, approve files, or upload to SharePoint. No customer
+content is sent to an online AI service. No network service starts.
+
+Windows 10/11 x64 is the target. The executable and installer are unsigned;
+Windows SmartScreen or company policy may ask for IT approval. Do not disable
+antivirus or security controls. Installation does not grant production approval.
+Use synthetic or approved sanitized input until company deployment controls,
+Windows parser containment, and real-data validation are complete.
+
+Results remain after uninstalling. Do not edit retained blobs, manifests or the
+SQLite database. Open manifest.csv in Excel for a readable inventory and close
+without saving changes. Text evidence is in extractions.json.
+
+SHA256SUMS.txt accompanies the release. THIRD_PARTY_NOTICES.txt contains licenses.

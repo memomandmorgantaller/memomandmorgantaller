@@ -78,3 +78,21 @@ passed for `3ad2d1e` in [run 38917255658](https://github.com/memomandmorgantalle
 warning/error annotations. The Windows test count is not inferred from the Linux
 count; detailed test logs require sign-in. No parser/schema migration or filing-policy
 change is involved. Workstation containment and production gates remain open.
+
+
+## Desktop packaging increment (2026-10-19)
+
+Baseline reverified before desktop changes: 61 passed, 1 Windows-only skip on Linux.
+Added a toolkit-independent desktop job controller, native Tk window, stage progress,
+explicit project selection, non-overwriting output directories and result access.
+The GUI performs no classification/approval/upload.
+
+Packaging requires a separate frozen parser dispatch: `sys.executable -m ...` would
+relaunch the bundled GUI instead of Python, and a windowed executable may have no
+stdout. Added a narrow worker path using bounded JSON file IPC, retaining the source
+CLI protocol and regression tests. No agent tools or external AI are involved.
+
+Local tests cover real demo processing, duplicate runs, project/output validation,
+failed-archive visibility, frozen-worker dispatch/failure, and stdout-free workers.
+Native UI and actual EXE/installer tests require Windows CI; local Linux passing
+results alone must not be described as a Windows release. See docs/13 for build gates.

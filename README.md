@@ -14,21 +14,23 @@ Read [delivery evidence and remaining gates](docs/09_SPRINT_0_1_DELIVERY.md) for
 coverage and limits. The original handoff specifications remain in `docs/01`–`08`;
 they describe the roadmap, not completed integrations.
 
-## Windows quick start
+## Windows: install and click
 
-From this checkout in PowerShell, using a restricted Windows account:
+Download **RFPRegistry-Setup-0.3.0-x64.exe** from the
+[desktop releases](https://github.com/memomandmorgantaller/memomandmorgantaller/releases),
+run it, and keep the desktop shortcut selected. Open **RFP Document Registry**, click
+**Try the built-in demonstration**, then **Process package**. No Python installation
+or PowerShell commands are required. The portable **RFPRegistry.exe** is also available.
 
-```powershell
-cd baseline\rfp_registry_m1
-.\setup_windows.ps1
-.\.venv\Scripts\python.exe examples\create_vertical_slice.py --output "$env:TEMP\rfp-demo.zip"
-.\.venv\Scripts\python.exe -m rfp_registry --source "$env:TEMP\rfp-demo.zip" --project "SYNTHETIC-DEMO" --output "$env:TEMP\rfp-demo-result"
-```
+The demonstration parses four documents and flags one deliberately unsupported CAD
+file. Click **Open results folder** to view the saved inventory and evidence.
+For your own approved sanitized input, choose the source, enter the project explicitly,
+and click **Process package**. Every run creates a new results folder.
 
-Use new paths if those already exist. The demonstration exits **2**, intentionally:
-four supported documents parse, and one synthetic CAD file is explicitly unsupported.
-Inspect `manifest.json`, `manifest.csv`, `extractions.json` and `registry.sqlite3` in
-the output directory. No source content leaves the machine during processing.
+The builds are unsigned; Windows/company policy may require IT approval. Keep security
+controls enabled. See [desktop instructions and build gates](docs/13_WINDOWS_DESKTOP.md).
+The [source developer instructions](baseline/rfp_registry_m1/README.md) still apply
+when running or building from Python.
 
 ## Improvement discipline
 
