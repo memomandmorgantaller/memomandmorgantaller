@@ -100,3 +100,9 @@ results alone must not be described as a Windows release. See docs/13 for build 
 Build review also identified that PyInstaller resolves relative data paths from the
 spec directory. The generated spec is now placed at the project root so bundled demo
 assets and version/icon paths resolve consistently; build outputs remain ignored.
+
+Windows CI successfully built the portable EXE and installer after the spec correction.
+The first distribution test then exposed a harness issue: copying Windows environment
+variables to a plain dict lost case-insensitive lookup for SystemRoot. The smoke harness
+now normalizes names and has regressions for mixed/lower/uppercase input; it still
+removes developer Python/Tk paths before launching the frozen application.

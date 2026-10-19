@@ -142,3 +142,27 @@ def test_native_desktop_buttons_process_demo(tmp_path):
     )
     assert process.returncode == 0, process.stderr.decode(errors="replace")
     assert json.loads(report.read_text(encoding="utf-8"))["ok"] is True
+
+
+@pytest.mark.parametrize("root_key", ["SystemRoot", "SYSTEMROOT", "systemroot"])
+def test_packaged_smoke_environment_is_windows_case_insensitive(root_key):
+    from ci.verify_windows_distribution import runtime_environment
+
+    environment = runtime_environment(
+        {
+            root_key: r"C:\Windows",
+            "Path": r"C:\developer-python",
+            "PythonPath": "developer source",
+            "Tcl_Library": "external Tk",
+        }
+    )
+    assert environment["PATH"] == r"C:\Windows\System32;C:\Windows"
+    assert "PYTHONPATH" not in environment
+    assert "TCL_LIBRARY" not in environment
+
+
+def test_packaged_smoke_environment_requires_windows_root():
+    from ci.verify_windows_distribution import runtime_environment
+
+    with pytest.raises(ValueError, match="SYSTEMROOT"):
+        runtime_environment({"PATH": "developer Python"})

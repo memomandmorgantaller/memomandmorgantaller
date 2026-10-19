@@ -4,20 +4,29 @@ from __future__ import annotations
 
 import hashlib
 import json
+import ntpath
 import os
 import subprocess
 import tempfile
+from collections.abc import Mapping
 from pathlib import Path
+
+
+def runtime_environment(environ: Mapping[str, str]) -> dict[str, str]:
+    # Windows environment names are case-insensitive, unlike a plain dict copy.
+    environment = {name.upper(): value for name, value in environ.items()}
+    root = environment.get("SYSTEMROOT")
+    if not root:
+        raise ValueError("Windows SYSTEMROOT is missing from the build environment")
+    for name in ("PYTHONHOME", "PYTHONPATH", "VIRTUAL_ENV", "TCL_LIBRARY", "TK_LIBRARY"):
+        environment.pop(name, None)
+    environment["PATH"] = ntpath.join(root, "System32") + ";" + root
+    return environment
 
 
 def smoke(executable: Path, root: Path) -> Path:
     report = root / "smoke-result.json"
-    environment = dict(os.environ)
-    for name in ("PYTHONHOME", "PYTHONPATH", "VIRTUAL_ENV", "TCL_LIBRARY", "TK_LIBRARY"):
-        environment.pop(name, None)
-    environment["PATH"] = (
-        str(Path(environment["SystemRoot"]) / "System32") + ";" + environment["SystemRoot"]
-    )
+    environment = runtime_environment(os.environ)
     process = subprocess.run(
         [
             str(executable),
